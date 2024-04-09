@@ -1,0 +1,425 @@
+# interface PoolStatistics {
+#   volumeUsd: BigInt
+#   lpFeesUsd: BigInt
+#   mtFeesUsd: BigInt
+#   swapCount: BigInt!
+# }
+
+# type Protocol implements PoolStatistics @entity {
+type Protocol @entity {
+  id: Bytes!
+  # tvlUsd: BigInt
+  # volumeUsd: BigInt
+  # lpFeesUsd: BigInt
+  # mtFeesUsd: BigInt
+  # swapCount: BigInt!
+  # snapshots: [ProtocolSnapshot!]! @derivedFrom(field: "protocol")
+}
+
+# enum Frequency {
+#   HOURLY
+#   DAILY
+#   WEEKLY
+# }
+
+# interface Snapshot {
+#   frequency: Frequency!
+#   timestamp: BigInt!
+# }
+
+# type ProtocolSnapshot implements PoolStatistics & Snapshot @entity {
+#   id: Bytes!
+#   protocol: Protocol!
+#   frequency: Frequency!
+#   timestamp: BigInt!
+#   tvlUsd: BigInt
+#   volumeUsd: BigInt
+#   lpFeesUsd: BigInt
+#   mtFeesUsd: BigInt
+#   swapCount: BigInt!
+# }
+
+type Token @entity {
+  id: Bytes!
+  name: String
+  symbol: String
+  decimals: Int
+  price: BigInt
+  baseTokenPairs: [Pair!]! @derivedFrom(field: "baseToken")
+  quoteTokenPairs: [Pair!]! @derivedFrom(field: "quoteToken")
+  swapsFrom: [Swap!]! @derivedFrom(field: "fromToken")
+  swapsTo: [Swap!]! @derivedFrom(field: "toToken")
+}
+
+# interface UserStatistics {
+#   volumeUsd: BigInt
+#   lpFeesUsd: BigInt
+#   mtFeesUsd: BigInt
+#   swapCount: BigInt!
+# }
+
+# type User implements UserStatistics @entity {
+type User @entity {
+  id: Bytes!
+  createdPairs: [Pair!]! @derivedFrom(field: "creator")
+  givenApprovals: [Approval!] @derivedFrom(field: "owner")
+  buyShares: [BuyShares!]! @derivedFrom(field: "to")
+  borrowerFlashLoans: [FlashLoan!]! @derivedFrom(field: "borrower")
+  receiverFlashLoans: [FlashLoan!]! @derivedFrom(field: "assetTo")
+  receivedApprovals: [Approval!]! @derivedFrom(field: "spender")
+  outgoingSellShares: [SellShares!]! @derivedFrom(field: "payer")
+  incomingSellShares: [SellShares!]! @derivedFrom(field: "to")
+  outgoingSwaps: [Swap!]! @derivedFrom(field: "trader")
+  incomingSwaps: [Swap!]! @derivedFrom(field: "receiver")
+  incomingTransfers: [Transfer!]! @derivedFrom(field: "to")
+  outgoingTransfers: [Transfer!]! @derivedFrom(field: "from")
+  # volumeUsd: BigInt
+  # lpFeesUsd: BigInt
+  # mtFeesUsd: BigInt
+  # swapCount: BigInt!
+  # snapshots: [UserSnapshot!]! @derivedFrom(field: "user")
+}
+
+# type UserSnapshot implements UserStatistics & Snapshot @entity {
+#   id: Bytes!
+#   user: User!
+#   frequency: Frequency!
+#   timestamp: BigInt!
+#   tvlUsd: BigInt
+#   volumeUsd: BigInt
+#   lpFeesUsd: BigInt
+#   mtFeesUsd: BigInt
+#   swapCount: BigInt!
+# }
+
+# type Pair implements PoolStatistics @entity {
+type Pair @entity {
+  id: Bytes!
+  baseToken: Token! # address
+  quoteToken: Token! # address
+  creator: User! # address
+  lpFeeRate: BigInt! # uint256
+  maintainerFeeRateModel: Bytes! # address
+  i: BigInt! # uint256
+  k: BigInt! # uint256
+  baseReserve: BigInt! # uint256
+  quoteReserve: BigInt! # uint256
+  approvals: [Approval!]! @derivedFrom(field: "pair")
+  buyShares: [BuyShares!]! @derivedFrom(field: "pair")
+  flashLoans: [FlashLoan!]! @derivedFrom(field: "pair")
+  parametersChanges: [ParametersChanged!]! @derivedFrom(field: "pair")
+  rChanges: [RChange!]! @derivedFrom(field: "pair")
+  sellShares: [SellShares!]! @derivedFrom(field: "pair")
+  swaps: [Swap!]! @derivedFrom(field: "pair")
+  targetChanges: [TargetChanged!]! @derivedFrom(field: "pair")
+  tokenRescues: [TokenRescue!]! @derivedFrom(field: "pair")
+  transfers: [Transfer!]! @derivedFrom(field: "pair")
+  removed: Boolean!
+  # tvlUsd: BigInt
+  # volumeUsd: BigInt
+  # lpFeesUsd: BigInt
+  # mtFeesUsd: BigInt
+  # swapCount: BigInt!
+  # snapshots: [PairSnapshot!]! @derivedFrom(field: "pair")
+}
+
+# type PairSnapshot implements PoolStatistics & Snapshot @entity {
+#   id: Bytes!
+#   pair: Pair!
+#   frequency: Frequency!
+#   timestamp: BigInt!
+#   volumeUsd: BigInt
+#   lpFeesUsd: BigInt
+#   mtFeesUsd: BigInt
+#   swapCount: BigInt!
+# }
+
+### Events ###
+interface Event {
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogBlastNativeClaimableEnabled implements Event @entity(immutable: true) {
+  id: Bytes!
+  contractAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogCreated implements Event @entity(immutable: true) {
+  id: Bytes!
+  clone: Bytes! # address
+  baseToken: Bytes! # address
+  quoteToken: Bytes! # address
+  creator: Bytes! # address
+  lpFeeRate: BigInt! # uint256
+  maintainerFeeRateModel: Bytes! # address
+  i: BigInt! # uint256
+  k: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogPoolAdded implements Event @entity(immutable: true) {
+  id: Bytes!
+  baseToken: Bytes! # address
+  quoteToken: Bytes! # address
+  creator: Bytes! # address
+  pool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogPoolRemoved implements Event @entity(immutable: true) {
+  id: Bytes!
+  pool: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogSetImplementation implements Event @entity(immutable: true) {
+  id: Bytes!
+  implementation: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogSetMaintainer implements Event @entity(immutable: true) {
+  id: Bytes!
+  newMaintainer: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogSetMaintainerFeeRateModel implements Event @entity(immutable: true) {
+  id: Bytes!
+  newMaintainerFeeRateModel: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type OwnershipTransferred implements Event @entity(immutable: true) {
+  id: Bytes!
+  user: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+type Approval implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  owner: User! # address
+  spender: User! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type BuyShares implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  to: User! # address
+  increaseShares: BigInt! # uint256
+  totalShares: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type FlashLoan implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  borrower: User! # address
+  assetTo: User! # address
+  baseAmount: BigInt! # uint256
+  quoteAmount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogBlastGasClaimed implements Event @entity(immutable: true) {
+  id: Bytes!
+  recipient: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type BlastMagicLPLogBlastNativeClaimableEnabled implements Event @entity(immutable: true) {
+  id: Bytes!
+  contractAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogBlastTokenClaimableEnabled implements Event @entity(immutable: true) {
+  id: Bytes!
+  contractAddress: Bytes! # address
+  token: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogBlastTokenClaimed implements Event @entity(immutable: true) {
+  id: Bytes!
+  recipient: Bytes! # address
+  token: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type LogFeeToChanged implements Event @entity(immutable: true) {
+  id: Bytes!
+  feeTo: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type OperatorChanged implements Event @entity(immutable: true) {
+  id: Bytes!
+  operator: Bytes! # address
+  status: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type BlastMagicLPOwnershipTransferred implements Event @entity(immutable: true) {
+  id: Bytes!
+  user: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type ParametersChanged implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  newLpFeeRate: BigInt! # uint256
+  newI: BigInt! # uint256
+  newK: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type PausedChanged implements Event @entity(immutable: true) {
+  id: Bytes!
+  paused: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type RChange implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  newRState: Int! # uint8
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type SellShares implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  payer: User! # address
+  to: User! # address
+  decreaseShares: BigInt! # uint256
+  totalShares: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type Swap implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  fromToken: Token! # address
+  toToken: Token! # address
+  fromAmount: BigInt! # uint256
+  toAmount: BigInt! # uint256
+  trader: User! # address
+  receiver: User! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type TargetChanged implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  newBaseTarget: BigInt! # uint112
+  newQuoteTarget: BigInt! # uint112
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type TokenRescue implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  token: Bytes! # address
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}
+
+type Transfer implements Event @entity(immutable: true) {
+  id: Bytes!
+  pair: Pair! # address
+  from: User! # address
+  to: User! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  logIndex: BigInt!
+}

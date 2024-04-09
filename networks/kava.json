@@ -1,0 +1,7 @@
+{
+  "network": "kava",
+  "factory": {
+    "address": "0x7Ad0e580d8458BbeF71EC6A1755c59651E1EAaa7",
+    "startBlock": "10023543"
+  }
+}

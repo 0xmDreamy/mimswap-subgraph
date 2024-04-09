@@ -1,0 +1,39 @@
+{
+  "name": "mimswap",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prepare": "husky && git config --local include.path ../.gitconfig & concurrently -m 1 bun:prepare:*",
+    "prepare:arbitrum-one": "mustache networks/arbitrum-one.json subgraph.yaml.mustache > subgraph.yaml && bun run codegen",
+    "prepare:blast-mainnet": "mustache networks/blast-mainnet.json subgraph.yaml.mustache > subgraph.yaml && bun run codegen",
+    "prepare:kava": "mustache networks/kava.json subgraph.yaml.mustache > subgraph.yaml && bun run codegen",
+    "prepare:mainnet": "mustache networks/mainnet.json subgraph.yaml.mustache > subgraph.yaml && bun run codegen",
+    "codegen": "concurrently bun:codegen:*",
+    "codegen:graph": "graph codegen",
+    "build": "graph build",
+    "deploy:arbitrum-one": "bun run prepare:arbitrum-one && graph deploy --studio mimswap-arbitrum",
+    "deploy:blast-mainnet": "bun run prepare:blast-mainnet && graph deploy --studio mimswap-blast",
+    "deploy:mainnet": "bun run prepare:mainnet && graph deploy --studio mimswap-mainnet",
+    "create-local": "graph create --node http://localhost:8020/ mimswap",
+    "remove-local": "graph remove --node http://localhost:8020/ mimswap",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 mimswap",
+    "test": "graph test",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "lint:ci": "biome ci"
+  },
+  "lint-staged": {
+    "*": [
+      "biome check --no-errors-on-unmatched --files-ignore-unknown=true --write"
+    ]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "@graphprotocol/graph-cli": "^0.81.0",
+    "@graphprotocol/graph-ts": "^0.35.1",
+    "concurrently": "^8.2.2",
+    "husky": "^9.1.5",
+    "lint-staged": "^15.2.10",
+    "matchstick-as": "^0.6.0"
+  }
+}

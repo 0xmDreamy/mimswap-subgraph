@@ -1,0 +1,128 @@
+specVersion: 1.2.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{ #factory }}
+  - kind: ethereum
+    name: BlastMIMSwapFactory
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: BlastMIMSwapFactory
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - LogBlastNativeClaimableEnabled
+        - LogCreated
+        - LogPoolAdded
+        - LogPoolRemoved
+        - LogSetImplementation
+        - LogSetMaintainer
+        - LogSetMaintainerFeeRateModel
+        - OwnershipTransferred
+      abis:
+        - name: BlastMIMSwapFactory
+          file: ./abis/BlastMIMSwapFactory.json
+        - name: BlastMagicLP
+          file: ./abis/BlastMagicLP.json
+        - name: IERC20
+          file: ./abis/IERC20.json
+      eventHandlers:
+        - event: LogBlastNativeClaimableEnabled(indexed address)
+          handler: handleLogBlastNativeClaimableEnabled
+        - event: LogCreated(address,indexed address,indexed address,indexed
+            address,uint256,address,uint256,uint256)
+          handler: handleLogCreated
+        - event: LogPoolAdded(address,address,address,address)
+          handler: handleLogPoolAdded
+        - event: LogPoolRemoved(address)
+          handler: handleLogPoolRemoved
+        - event: LogSetImplementation(indexed address)
+          handler: handleLogSetImplementation
+        - event: LogSetMaintainer(indexed address)
+          handler: handleLogSetMaintainer
+        - event: LogSetMaintainerFeeRateModel(address)
+          handler: handleLogSetMaintainerFeeRateModel
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/mappings/mimswapFactory.ts
+  {{ /factory }}
+templates:
+  - kind: ethereum
+    name: BlastMagicLP
+    network: {{ network }}
+    source:
+      abi: BlastMagicLP
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - BuyShares
+        - FlashLoan
+        - LogBlastGasClaimed
+        - BlastMagicLPLogBlastNativeClaimableEnabled
+        - LogBlastTokenClaimableEnabled
+        - LogBlastTokenClaimed
+        - LogFeeToChanged
+        - OperatorChanged
+        - BlastMagicLPOwnershipTransferred
+        - ParametersChanged
+        - PausedChanged
+        - RChange
+        - SellShares
+        - Swap
+        - TargetChanged
+        - TokenRescue
+        - Transfer
+      abis:
+        - name: BlastMagicLP
+          file: ./abis/BlastMagicLP.json
+        - name: IERC20
+          file: ./abis/IERC20.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: BuyShares(address,uint256,uint256)
+          handler: handleBuyShares
+        - event: FlashLoan(address,address,uint256,uint256)
+          handler: handleFlashLoan
+        - event: LogBlastGasClaimed(indexed address,uint256)
+          handler: handleLogBlastGasClaimed
+        - event: LogBlastNativeClaimableEnabled(indexed address)
+          handler: handleLogBlastNativeClaimableEnabled
+        - event: LogBlastTokenClaimableEnabled(indexed address,indexed address)
+          handler: handleLogBlastTokenClaimableEnabled
+        - event: LogBlastTokenClaimed(indexed address,indexed address,uint256)
+          handler: handleLogBlastTokenClaimed
+        - event: LogFeeToChanged(indexed address)
+          handler: handleLogFeeToChanged
+        - event: OperatorChanged(indexed address,bool)
+          handler: handleOperatorChanged
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: ParametersChanged(uint256,uint256,uint256)
+          handler: handleParametersChanged
+        - event: PausedChanged(bool)
+          handler: handlePausedChanged
+        - event: RChange(uint8)
+          handler: handleRChange
+        - event: SellShares(address,address,uint256,uint256)
+          handler: handleSellShares
+        - event: Swap(address,address,uint256,uint256,address,address)
+          handler: handleSwap
+        - event: TargetChanged(uint112,uint112)
+          handler: handleTargetChanged
+        - event: TokenRescue(indexed address,address,uint256)
+          handler: handleTokenRescue
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/magicLp.ts

@@ -1,0 +1,7 @@
+{
+  "network": "arbitrum-one",
+  "factory": {
+    "address": "0x8D0Cd3eEf1794F59F2B3a664Ef07fCAD401FEc73",
+    "startBlock": "205217727"
+  }
+}

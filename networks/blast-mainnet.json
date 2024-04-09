@@ -1,0 +1,7 @@
+{
+  "network": "blast-mainnet",
+  "factory": {
+    "address": "0x7E05363E225c1c8096b1cd233B59457104B84908",
+    "startBlock": 1067907
+  }
+}
